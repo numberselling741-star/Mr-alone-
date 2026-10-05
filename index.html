@@ -1,0 +1,30 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Mr Alone</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css"></head><body><div class="bg"></div><div class="wrap">
+<header class="glass"><div class="logo">✦ MR ALONE</div><button class="btn ico" id="sb">🔍</button></header>
+<div id="sbar" class="glass"><input id="q" placeholder="Search…"></div>
+<h2>Tilawat-e-Quran Pak</h2><div class="glass quran"><div class="ar">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div><div id="tl"></div></div>
+<h2>Channels</h2><div class="grid" id="chs"></div>
+<h2>Courses</h2><div id="course"></div>
+<h2>Stats</h2><div class="stats" id="stats"></div><footer>© Mr Alone</footer></div>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getFirestore,doc,onSnapshot,getDoc,setDoc,updateDoc,increment} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {firebaseConfig} from "./firebase-config.js";
+const db=getFirestore(initializeApp(firebaseConfig)),$=i=>document.getElementById(i);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const safe=u=>/^(https?:\/\/|tel:)/i.test(u||"")?u:"#";
+let S={tilawat:[],channels:[],courses:[],stats:{}},views=0;
+function render(){const q=$("q").value.toLowerCase();
+$("tl").innerHTML=S.tilawat.map(t=>`<a class="glass tr" href="${esc(safe(t.url))}" target="_blank" rel="noopener">▶ ${esc(t.title)}</a>`).join("");
+$("chs").innerHTML=S.channels.filter(c=>c.name.toLowerCase().includes(q)).map(c=>`<a class="glass ch" href="${esc(safe(c.url))}" target="_blank" rel="noopener"><img class="dp" src="${esc(safe(c.dp))}" alt=""><b>${esc(c.name)}</b></a>`).join("");
+$("course").innerHTML=S.courses.filter(k=>k.name.toLowerCase().includes(q)).map(k=>`<div class="glass course"><h3 style="margin:0 0 6px">${esc(k.name)}</h3><div class="price">${esc(k.price)}</div><p style="color:var(--m)">${esc(k.desc)}</p>${k.contact?`<a class="btn gold" style="text-decoration:none" href="${esc(safe(k.contact))}" target="_blank" rel="noopener">Contact</a> ${esc(k.contact)}`:""}</div>`).join("");
+const t=S.stats||{};$("stats").innerHTML=[["Views",views],["Users",t.used],["Seen",t.seen],["Online",t.online],["Reviews",t.reviews]].map(([l,v])=>`<div class="glass st"><b>${Number(v||0).toLocaleString()}</b><span>${l}</span></div>`).join("")}
+$("sb").onclick=()=>{$("sbar").classList.toggle("open");if(!$("sbar").classList.contains("open")){$("q").value="";render()}else $("q").focus()};
+$("q").oninput=render;render();
+onSnapshot(doc(db,"site","main"),s=>{if(s.exists()){S={...S,...s.data()};render()}});
+const c=doc(db,"site","counter");
+try{const s=await getDoc(c);if(s.exists())await updateDoc(c,{n:increment(1)});else await setDoc(c,{n:1});}catch(e){}
+onSnapshot(c,s=>{views=s.exists()?s.data().n:0;render()});
+</script></body></html>
