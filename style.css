@@ -36,3 +36,21 @@ h2{font-size:15px;letter-spacing:2px;color:var(--g);margin:26px 4px 12px;text-tr
 .chip{display:inline-block;font-size:11px;padding:3px 9px;border-radius:20px;border:1px solid var(--b);color:var(--m);margin:0 4px 4px 0}.badge{background:var(--g);color:#201700;font-weight:600;border:0}
 .old{text-decoration:line-through;color:var(--m);font-size:14px;margin-left:8px;font-weight:400}.stt{font-size:11px;padding:3px 10px;border-radius:20px;border:1px solid var(--b)}
 #dm{position:fixed;inset:0;z-index:40;background:#000c;overflow:auto;padding:16px}#dm .glass{max-width:640px;margin:20px auto;padding:20px;background:var(--bg)}.pre{white-space:pre-wrap;color:var(--m)}
+
+/* soft aurora + glass theme */
+.bg{background:linear-gradient(160deg,#120b1d,#1b1031 45%,#0e1424);overflow:hidden}
+.bg::before,.bg::after{content:"";position:absolute;border-radius:50%;filter:blur(70px);opacity:.6;animation:fl 18s ease-in-out infinite alternate}
+.bg::before{width:60vmax;height:60vmax;left:-15vmax;top:-10vmax;background:radial-gradient(circle,#ff9a8b99,#ff6a8844 45%,transparent 70%)}
+.bg::after{width:55vmax;height:55vmax;right:-15vmax;bottom:-12vmax;background:radial-gradient(circle,#ffd6a577,#c77dff44 50%,transparent 70%);animation-duration:24s}
+@keyframes fl{to{transform:translate(6vmax,5vmax) scale(1.15)}}
+.glass{background:linear-gradient(135deg,#ffffff1f,#ffffff0a);border:1px solid #ffffff26;box-shadow:0 12px 40px #0006,inset 0 1px 0 #ffffff40,inset 0 0 30px #ffffff0a}
+.btn{background:linear-gradient(135deg,#ffffff2a,#ffffff0d);border:1px solid #ffffff30;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 6px 18px #0004,inset 0 1px 0 #ffffff55;transition:transform .18s,box-shadow .18s}
+.btn:hover{transform:translateY(-2px)}
+.btn:active{transform:scale(.95);box-shadow:inset 0 3px 10px #0007,0 0 0 3px #ffffff18}
+.gold{background:linear-gradient(135deg,#ffe3b0,#f0b56a 55%,#e08e6d);border:0;box-shadow:0 8px 24px #f0a56a55,inset 0 1px 0 #fff9}
+#gate{background:#0b0716bb;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+:root[data-theme=light] .bg{background:linear-gradient(160deg,#fff4ec,#ffe9f0 50%,#efe9ff)}
+:root[data-theme=light] .glass{background:linear-gradient(135deg,#ffffffd0,#ffffff80);border-color:#0000001a;box-shadow:0 10px 30px #00000014,inset 0 1px 0 #fff}
+:root[data-theme=light] .btn{background:linear-gradient(135deg,#ffffffe0,#ffffff90);border-color:#0000001a;box-shadow:0 6px 16px #0000001a,inset 0 1px 0 #fff}
+:root[data-theme=light] .gold{background:linear-gradient(135deg,#ffe3b0,#f0b56a 55%,#e08e6d);border:0}
+:root[data-theme=light] #gate{background:#fff4ecd0}
