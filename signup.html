@@ -1,0 +1,32 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Sign up · Mr Alone</title><meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet"><link rel="stylesheet" href="auth.css"></head><body><div class="bgfx"></div>
+<main class="wrap2"><section class="hero"><div id="chr" class="chr-wrap"></div><h2>Welcome to Mr Alone</h2><p>Your premium learning and tools hub</p></section>
+<section class="card glass2"><h1>Create account</h1><p class="sub">Join Mr Alone in a minute</p><form id="f" novalidate><div class="fg"><label for="nm">Full name</label><input id="nm" maxlength="40" autocomplete="name" placeholder="Your full name"></div><div class="fg"><label for="un">Username</label><input id="un" maxlength="20" autocomplete="username" placeholder="letters, numbers, underscore"></div><div class="fg"><label for="em">Email</label><input id="em" type="email" autocomplete="email" placeholder="you@gmail.com"></div><div class="fg"><label for="pw">Password</label><input id="pw" type="password" autocomplete="new-password" placeholder="Minimum 6 characters"><button type="button" class="eye" data-t="pw">👁</button></div><div class="fg"><label for="pw2">Confirm password</label><input id="pw2" type="password" autocomplete="new-password" placeholder="Repeat password"><button type="button" class="eye" data-t="pw2">👁</button></div><button class="bt" id="go" type="submit">Create Account</button></form><div class="foot">Already have an account? <a href="login.html">Login</a></div></section></main><div id="toasts"></div>
+<script src="character.js"></script>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,createUserWithEmailAndPassword,sendPasswordResetEmail,deleteUser,setPersistence,browserLocalPersistence} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {getFirestore,doc,setDoc} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {firebaseConfig} from "./firebase-config.js";
+const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),$=i=>document.getElementById(i);
+function toast(m,t){const e=document.createElement("div");e.className="toast "+(t||"");e.textContent=m;$("toasts").appendChild(e);setTimeout(()=>e.remove(),3800)}
+const MSG={"auth/invalid-credential":"Invalid email or password","auth/wrong-password":"Invalid email or password","auth/user-not-found":"No account found with this email","auth/invalid-email":"Please enter a valid email address","auth/email-already-in-use":"This email is already registered. Please log in.","auth/weak-password":"Password is too weak (minimum 6 characters)","auth/too-many-requests":"Too many attempts. Please try again later","auth/network-request-failed":"Network error. Please check your internet","auth/user-disabled":"This account is disabled","permission-denied":"Access denied (registration may be closed)"};
+const msg=e=>MSG[e&&e.code]||"Something went wrong ("+((e&&(e.code||e.message))||"error")+")";
+function busy(b,t){b.disabled=true;b.innerHTML='<span class="sp"></span>'+t}
+function idle(b,t,shake){b.disabled=false;b.textContent=t;if(shake){const c=document.querySelector(".card");c.classList.remove("shake");void c.offsetWidth;c.classList.add("shake")}}
+document.querySelectorAll(".eye").forEach(b=>b.onclick=()=>{const i=$(b.dataset.t);i.type=i.type==="password"?"text":"password";b.textContent=i.type==="password"?"👁":"🙈"});
+window.mountCharacter($("chr"));
+$("f").onsubmit=async e=>{e.preventDefault();const nm=$("nm").value.trim(),un=$("un").value.trim().toLowerCase(),em=$("em").value.trim(),pw=$("pw").value,b=$("go");
+const bad=m=>{toast(m,"err");idle(b,"Create Account",true)};
+if(!nm||!un||!em||!pw||!$("pw2").value)return bad("Please fill in all fields");
+if(nm.length<2)return bad("Please enter your full name");
+if(!/^[a-z0-9_]{3,20}$/.test(un))return bad("Username: 3-20 letters, numbers or underscore");
+if(!/^\S+@\S+\.\S+$/.test(em))return bad("Please enter a valid email address");
+if(pw.length<6)return bad("Password must be at least 6 characters");
+if(pw!==$("pw2").value)return bad("Passwords do not match");
+busy(b,"Creating account...");let cred=null;
+try{cred=await createUserWithEmailAndPassword(auth,em,pw)}catch(x){return bad(msg(x))}
+try{await setDoc(doc(db,"usernames",un),{uid:cred.user.uid})}catch(x){try{await deleteUser(cred.user)}catch(y){}return bad("This username is already taken")}
+try{await setDoc(doc(db,"members",cred.user.uid),{name:nm,username:un,email:em,status:"pending",ts:Date.now()})}catch(x){return bad(msg(x))}
+b.classList.add("ok");b.textContent="✓ Account created";toast("Account created successfully","good");setTimeout(()=>location.replace("index.html"),900)};
+</script></body></html>

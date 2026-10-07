@@ -1,0 +1,27 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Login · Mr Alone</title><meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet"><link rel="stylesheet" href="auth.css"></head><body><div class="bgfx"></div>
+<main class="wrap2"><section class="hero"><div id="chr" class="chr-wrap"></div><h2>Welcome to Mr Alone</h2><p>Your premium learning and tools hub</p></section>
+<section class="card glass2"><h1>Login</h1><p class="sub">Sign in to continue</p><form id="f" novalidate><div class="fg"><label for="em">Email</label><input id="em" type="email" autocomplete="email" placeholder="you@gmail.com"></div><div class="fg"><label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password" placeholder="Your password"><button type="button" class="eye" data-t="pw">👁</button></div><div class="lnk"><span></span><a href="forgot-password.html">Forgot password?</a></div><button class="bt" id="go" type="submit">Login</button></form><div class="foot">Don't have an account? <a href="signup.html">Sign up</a></div></section></main><div id="toasts"></div>
+<script src="character.js"></script>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,createUserWithEmailAndPassword,sendPasswordResetEmail,deleteUser,setPersistence,browserLocalPersistence} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {getFirestore,doc,setDoc} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {firebaseConfig} from "./firebase-config.js";
+const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),$=i=>document.getElementById(i);
+function toast(m,t){const e=document.createElement("div");e.className="toast "+(t||"");e.textContent=m;$("toasts").appendChild(e);setTimeout(()=>e.remove(),3800)}
+const MSG={"auth/invalid-credential":"Invalid email or password","auth/wrong-password":"Invalid email or password","auth/user-not-found":"No account found with this email","auth/invalid-email":"Please enter a valid email address","auth/email-already-in-use":"This email is already registered. Please log in.","auth/weak-password":"Password is too weak (minimum 6 characters)","auth/too-many-requests":"Too many attempts. Please try again later","auth/network-request-failed":"Network error. Please check your internet","auth/user-disabled":"This account is disabled","permission-denied":"Access denied (registration may be closed)"};
+const msg=e=>MSG[e&&e.code]||"Something went wrong ("+((e&&(e.code||e.message))||"error")+")";
+function busy(b,t){b.disabled=true;b.innerHTML='<span class="sp"></span>'+t}
+function idle(b,t,shake){b.disabled=false;b.textContent=t;if(shake){const c=document.querySelector(".card");c.classList.remove("shake");void c.offsetWidth;c.classList.add("shake")}}
+document.querySelectorAll(".eye").forEach(b=>b.onclick=()=>{const i=$(b.dataset.t);i.type=i.type==="password"?"text":"password";b.textContent=i.type==="password"?"👁":"🙈"});
+window.mountCharacter($("chr"));
+let busyLogin=false;
+setPersistence(auth,browserLocalPersistence).catch(()=>{});
+onAuthStateChanged(auth,u=>{if(u&&!busyLogin)location.replace("index.html")});
+$("f").onsubmit=async e=>{e.preventDefault();const em=$("em").value.trim(),pw=$("pw").value,b=$("go");
+if(!em||!pw){toast("Please enter your email and password","err");return idle(b,"Login",true)}
+busyLogin=true;busy(b,"Logging in...");
+try{await signInWithEmailAndPassword(auth,em,pw);b.disabled=true;b.classList.add("ok");b.textContent="✓ Login successful";toast("Login successful","good");setTimeout(()=>location.replace("index.html"),700)}
+catch(x){busyLogin=false;toast(msg(x),"err");idle(b,"Login",true)}};
+</script></body></html>
