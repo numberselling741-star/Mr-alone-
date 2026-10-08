@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Login · Mr Alone</title><meta name="viewport" content="width=device-width,initial-scale=1">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet"><link rel="stylesheet" href="auth.css"><link rel="manifest" href="manifest.json"><meta name="theme-color" content="#120b1d"></head><body><div class="bgfx"></div>
 <main class="wrap2"><section class="hero"><div id="chr" class="chr-wrap"></div><h2>Welcome to Mr Alone</h2><p>Your premium learning and tools hub</p></section>
-<section class="card glass2"><h1>Login</h1><p class="sub">Sign in to continue</p><form id="f" novalidate><div class="fg"><label for="em">Email</label><input id="em" type="email" autocomplete="email" placeholder="you@gmail.com"></div><div class="fg"><label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password" placeholder="Your password"><button type="button" class="eye" data-t="pw">👁</button></div><div class="lnk"><span></span><a href="forgot-password.html">Forgot password?</a></div><button class="bt" id="go" type="submit">Login</button></form><div class="foot">Don't have an account? <a href="signup.html">Sign up</a></div></section></main><div id="toasts"></div>
+<section class="card glass2 hold"><h1>Login</h1><p class="sub">Sign in to continue</p><form id="f" novalidate><div class="fg"><label for="em">Email</label><input id="em" type="email" autocomplete="email" placeholder="you@gmail.com"></div><div class="fg"><label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password" placeholder="Your password"><button type="button" class="eye" data-t="pw">👁</button></div><div class="lnk"><span></span><a href="forgot-password.html">Forgot password?</a></div><button class="bt" id="go" type="submit">Login</button></form><div class="foot">Don't have an account? <a href="signup.html">Sign up</a></div></section></main><div id="toasts"></div>
 <script src="character.js"></script>
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -16,6 +16,12 @@ function busy(b,t){b.disabled=true;b.innerHTML='<span class="sp"></span>'+t}
 function idle(b,t,shake){b.disabled=false;b.textContent=t;if(shake){const c=document.querySelector(".card");c.classList.remove("shake");void c.offsetWidth;c.classList.add("shake")}}
 document.querySelectorAll(".eye").forEach(b=>b.onclick=()=>{const i=$(b.dataset.t);i.type=i.type==="password"?"text":"password";b.textContent=i.type==="password"?"👁":"🙈"});
 window.mountCharacter($("chr"));
+const stage=$("chr"),svg=stage.querySelector("svg"),card=document.querySelector(".card");let shown=false;
+function showForm(){if(shown)return;shown=true;stage.classList.remove("walk");svg.classList.remove("dance");card.classList.remove("hold");card.classList.add("reveal")}
+if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches){showForm()}else{
+stage.classList.add("walk");svg.classList.add("dance");
+stage.addEventListener("animationend",e=>{if(e.target===stage&&e.animationName==="walkin"){svg.classList.remove("dance");setTimeout(showForm,700)}});
+document.addEventListener("pointerdown",showForm,{once:true});setTimeout(showForm,7000)}
 let busyLogin=false;
 setPersistence(auth,browserLocalPersistence).catch(()=>{});
 if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
