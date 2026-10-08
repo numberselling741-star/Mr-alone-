@@ -1,0 +1,26 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Profile · Mr Alone</title><meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css"><link rel="manifest" href="manifest.json"><meta name="theme-color" content="#120b1d"></head>
+<body><div class="bg"></div><div class="wrap"><header class="glass"><div class="logo">✦ MY PROFILE</div><a class="btn" href="index.html" style="text-decoration:none">← Back</a></header>
+<div class="glass course" id="box" style="text-align:center"><img id="av" class="dp" alt="" style="display:none"><div id="avp" class="dp"></div>
+<div class="f" style="text-align:left"><label style="font-size:12px;color:var(--m)">Full name</label><input id="nm" maxlength="40"><div id="info" style="color:var(--m);font-size:13px;line-height:1.8"></div>
+<button class="btn gold" id="sv">Save name</button><button class="btn" id="ph">📁 Change profile photo</button><button class="btn" id="pw">Send password reset email</button><button class="btn" id="lo">Logout</button><small id="msg" style="color:var(--g)"></small></div></div></div>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getAuth,onAuthStateChanged,signOut,sendPasswordResetEmail} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {getFirestore,doc,getDoc,setDoc,updateDoc} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {firebaseConfig} from "./firebase-config.js";
+const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),$=i=>document.getElementById(i);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let U=null,M=null;const msg=t=>{$("msg").textContent=t};
+function pick(w){return new Promise((ok,no)=>{const i=document.createElement("input");i.type="file";i.accept="image/*";i.onchange=()=>{const f=i.files[0];if(!f)return no(new Error("none"));const im=new Image(),u=URL.createObjectURL(f);im.onload=()=>{const k=Math.min(1,w/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext("2d").drawImage(im,0,0,c.width,c.height);const ty=c.toDataURL("image/webp",.8).indexOf("data:image/webp")===0?"image/webp":"image/jpeg";let q=.85,d=c.toDataURL(ty,q);while(d.length>240000&&q>.3){q-=.1;d=c.toDataURL(ty,q)}URL.revokeObjectURL(u);d.length>240000?no(new Error("Image is too large")):ok(d)};im.onerror=()=>no(new Error("Could not read image"));im.src=u};i.click()})}
+async function showAv(){try{const x=await getDoc(doc(db,"images",U.uid+"_dp"));if(x.exists()){$("av").src=x.data().d;$("av").style.display="block";$("avp").style.display="none"}}catch(e){}}
+onAuthStateChanged(auth,async u=>{if(!u)return location.replace("login.html");U=u;
+try{const s=await getDoc(doc(db,"members",u.uid));M=s.exists()?s.data():null}catch(e){}
+if(!M){$("info").textContent="Profile not found.";return}
+$("nm").value=M.name||"";const pl=M.exp>0?(M.exp<Date.now()?"Expired on "+new Date(M.exp).toLocaleDateString():(M.plan||"plan")+" · ends "+new Date(M.exp).toLocaleDateString()):(M.plan||"unlimited")+" · no expiry";
+$("info").innerHTML="Username: <b>@"+esc(M.username||"-")+"</b><br>Email: "+esc(u.email)+"<br>Status: "+esc(M.status)+"<br>Plan: "+esc(pl);showAv()});
+$("sv").onclick=async()=>{const n=$("nm").value.trim();if(n.length<2)return msg("Please enter your name");try{await updateDoc(doc(db,"members",U.uid),{name:n.slice(0,40)});msg("Name saved")}catch(e){msg("Could not save ("+(e.code||e.message)+")")}};
+$("ph").onclick=async()=>{try{const d=await pick(256);await setDoc(doc(db,"images",U.uid+"_dp"),{d,ts:Date.now()});$("av").src=d;$("av").style.display="block";$("avp").style.display="none";msg("Photo updated")}catch(e){if(e&&e.message!=="none")msg("Upload failed: "+(e.code||e.message))}};
+$("pw").onclick=async()=>{try{await sendPasswordResetEmail(auth,U.email);msg("Reset email sent. Check your inbox and Spam.")}catch(e){msg(e.code||e.message)}};
+$("lo").onclick=()=>signOut(auth).then(()=>location.replace("login.html"));
+</script></body></html>
