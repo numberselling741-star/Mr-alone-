@@ -49,3 +49,22 @@ html{overflow-x:hidden}
 @keyframes shd{from{transform:scale(1)}to{transform:scale(.8);opacity:.25}}
 .card.hold{opacity:0;animation:none;pointer-events:none;transform:translateY(40px)}
 .card.reveal{animation:up 1s cubic-bezier(.2,.9,.2,1) both}
+
+/* pistol + blast intro (login page) */
+.gun{display:none}.armed .gun{display:block}
+.muz{opacity:0;transform-origin:298px 198px}
+.fire .muz{animation:muzp .35s ease-out forwards}
+@keyframes muzp{0%{opacity:1;transform:scale(.3)}60%{opacity:1;transform:scale(1.5)}100%{opacity:0;transform:scale(1.8)}}
+.aim .wv{animation:aimUp .55s cubic-bezier(.2,1.4,.4,1) forwards}
+@keyframes aimUp{from{transform:rotate(0)}to{transform:rotate(-82deg)}}
+.fire .fl{animation:recoil .35s ease-out}
+@keyframes recoil{0%{transform:translateX(0)}30%{transform:translateX(-12px) rotate(-3deg)}100%{transform:none}}
+.boom{position:fixed;inset:0;z-index:90;pointer-events:none;overflow:hidden}
+.boom .fl2{position:absolute;inset:0;background:radial-gradient(circle at 70% 25%,#fff,#ffd36e 40%,transparent 75%);animation:flash .55s ease-out forwards}
+@keyframes flash{0%{opacity:1}100%{opacity:0}}
+.boom i{position:absolute;width:11px;height:11px;border-radius:50%;animation:spark 1.1s ease-out forwards}
+@keyframes spark{to{transform:translate(var(--dx),var(--dy)) scale(0);opacity:0}}
+.boom .bang{position:absolute;left:50%;top:36%;transform:translate(-50%,-50%) rotate(-8deg);font:800 68px Poppins,sans-serif;color:#ffd36e;text-shadow:0 0 30px #ff8a3d,4px 4px 0 #c0392b;animation:pop 1.1s ease-out forwards}
+@keyframes pop{0%{transform:translate(-50%,-50%) rotate(-8deg) scale(.2);opacity:0}20%{transform:translate(-50%,-50%) rotate(-8deg) scale(1.2);opacity:1}100%{transform:translate(-50%,-50%) rotate(-8deg) scale(1);opacity:0}}
+.shk{animation:shk .45s}
+@media(max-width:800px){.boom .bang{font-size:48px}}

@@ -16,12 +16,16 @@ function busy(b,t){b.disabled=true;b.innerHTML='<span class="sp"></span>'+t}
 function idle(b,t,shake){b.disabled=false;b.textContent=t;if(shake){const c=document.querySelector(".card");c.classList.remove("shake");void c.offsetWidth;c.classList.add("shake")}}
 document.querySelectorAll(".eye").forEach(b=>b.onclick=()=>{const i=$(b.dataset.t);i.type=i.type==="password"?"text":"password";b.textContent=i.type==="password"?"👁":"🙈"});
 window.mountCharacter($("chr"));
-const stage=$("chr"),svg=stage.querySelector("svg"),card=document.querySelector(".card");let shown=false;
-function showForm(){if(shown)return;shown=true;stage.classList.remove("walk");svg.classList.remove("dance");card.classList.remove("hold");card.classList.add("reveal")}
+const stage=$("chr"),svg=stage.querySelector("svg"),card=document.querySelector(".card"),wrap=document.querySelector(".wrap2");let shown=false;
+function showForm(){if(shown)return;shown=true;stage.classList.remove("walk");svg.classList.remove("dance","armed","aim","fire");card.classList.remove("hold");card.classList.add("reveal")}
+function boom(){const rc=stage.getBoundingClientRect(),cx=rc.left+rc.width*.8,cy=rc.top+rc.height*.18,b=document.createElement("div");b.className="boom";b.innerHTML='<div class="fl2"></div><div class="bang">BANG!</div>';document.body.appendChild(b);
+const cols=["#ffd36e","#ff8a3d","#fff","#4da3ff","#ff5d73"];for(let i=0;i<46;i++){const p=document.createElement("i"),a=Math.random()*Math.PI*2,d=110+Math.random()*280;p.style.cssText="left:"+cx+"px;top:"+cy+"px;background:"+cols[i%5]+";--dx:"+Math.cos(a)*d+"px;--dy:"+Math.sin(a)*d+"px;animation-delay:"+(Math.random()*.08)+"s";b.appendChild(p)}
+wrap.classList.add("shk");setTimeout(()=>{b.remove();wrap.classList.remove("shk")},1500)}
 if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches){showForm()}else{
-stage.classList.add("walk");svg.classList.add("dance");
-stage.addEventListener("animationend",e=>{if(e.target===stage&&e.animationName==="walkin"){svg.classList.remove("dance");setTimeout(showForm,700)}});
-document.addEventListener("pointerdown",showForm,{once:true});setTimeout(showForm,7000)}
+stage.classList.add("walk");svg.classList.add("dance","armed");
+stage.addEventListener("animationend",e=>{if(e.target===stage&&e.animationName==="walkin"){svg.classList.remove("dance");svg.classList.add("aim");
+setTimeout(()=>{svg.classList.add("fire");boom();setTimeout(()=>{svg.classList.remove("fire","aim","armed");setTimeout(showForm,600)},700)},700)}});
+document.addEventListener("pointerdown",showForm,{once:true});setTimeout(showForm,10000)}
 let busyLogin=false;
 setPersistence(auth,browserLocalPersistence).catch(()=>{});
 if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
