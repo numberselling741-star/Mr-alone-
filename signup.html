@@ -29,5 +29,5 @@ busy(b,"Creating account...");let cred=null;
 try{cred=await createUserWithEmailAndPassword(auth,em,pw)}catch(x){return bad(msg(x))}
 try{await setDoc(doc(db,"usernames",un),{uid:cred.user.uid})}catch(x){try{await deleteUser(cred.user)}catch(y){}return bad("This username is already taken")}
 try{await setDoc(doc(db,"members",cred.user.uid),{name:nm,username:un,email:em,status:"pending",ts:Date.now(),...(RF?{ref:RF}:{})})}catch(x){return bad(msg(x))}
-b.classList.add("ok");b.textContent="✓ Account created";toast("Account created successfully","good");setTimeout(()=>location.replace("index.html"),900)};
+b.classList.add("ok");b.textContent="✓ Request sent";toast("Account created. Join request sent — waiting for approval","good");setTimeout(()=>location.replace("index.html"),900)};
 </script></body></html>
